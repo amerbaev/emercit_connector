@@ -15,16 +15,18 @@ class EmercitProvider:
         self._connector = connector
         self._mongo = mongo
 
-    def dump_all(self, from_date: date, to_date: date = date.today()):
+    def dump_all(self, from_date: date, to_date: date = date.today(), fields: list = None):
         features = self._connector.overall()
         self._mongo.save_features(features)
 
         exists_modes = {}
         for feature in features:
             properties = feature['properties']
+            feature_id = properties['id']
             for field, val in properties['data'].items():
+                if fields is not None and field not in fields:
+                    continue
                 if val is not None:
-                    feature_id = properties['id']
                     if feature_id not in exists_modes:
                         exists_modes[feature_id] = []
                     exists_modes[feature_id].append(map_kwargs(field))
@@ -35,14 +37,21 @@ class EmercitProvider:
             date_to = from_date + timedelta(days=delta + 49)
             for feature_id, modes in exists_modes.items():
                 for kwargs in modes:
-                    measurements, _, _ = self._connector.mgraph(station_id=feature_id,
-                                                                date_from=date_from,
-                                                                date_to=date_to,
-                                                                **kwargs)
-                    self._mongo.save_measurements(station_id=feature_id,
-                                                  mode=kwargs['mode'],
-                                                  measurements=measurements)
+                    try:
+                        measurements, _, _ = self._connector.mgraph(station_id=feature_id,
+                                                                    date_from=date_from,
+                                                                    date_to=date_to,
+                                                                    **kwargs)
+                    except Exception as e:
+                        print("Can't get measurements for station {} from {} to {} with params {}"
+                              .format(feature_id, date_from, date_to, kwargs))
+                        print(e)
+                    else:
+                        self._mongo.save_measurements(station_id=feature_id,
+                                                      mode=kwargs['mode'],
+                                                      measurements=measurements)
 
 
 if __name__ == '__main__':
-    EmercitProvider().dump_all(from_date=date(year=2019, month=1, day=1))
+    EmercitProvider().dump_all(from_date=date(year=2019, month=1, day=1),
+                               fields=['river_level', 'precipitation', 'temperature', 'humidity'])
