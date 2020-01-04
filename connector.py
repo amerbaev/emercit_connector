@@ -1,3 +1,4 @@
+import logging
 import time
 import datetime
 from typing import Union
@@ -6,6 +7,8 @@ import requests
 import pytz
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
+
+logger = logging.getLogger()
 
 
 class EmercitConnector:
@@ -39,6 +42,7 @@ class EmercitConnector:
     def mgraph(self, station_id: int = None, station_name: str = None,
                date_from: Union[str, datetime.date] = None, date_to: Union[str, datetime.date] = None,
                mode: str = 'distance', nocache: int = None, **kwargs):
+        logger.debug("Getting mgraph")
         if nocache is None:
             nocache = int(time.time())
 
@@ -88,7 +92,7 @@ class EmercitConnector:
             if obs_values is None:
                 continue
             observations[obs_key] = {
-                # yes GMT-(MIUNIS)3 because fuck you
+                # yes GMT-(MINUS)3 because fuck you
                 datetime.datetime.fromtimestamp(obs[0] // 1000, tz=pytz.timezone('Etc/GMT-3')): obs[1]
                 for obs in obs_values if obs[1] is not None
             }
