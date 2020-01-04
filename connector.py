@@ -17,7 +17,7 @@ class EmercitConnector:
                         backoff_factor=0.1,
                         status_forcelist=[500, 502, 503, 504])
         self.session = requests.session()
-        self.session.mount('http://', HTTPAdapter(max_retries=retries))
+        self.session.mount('http://', HTTPAdapter(max_retries=retries, pool_maxsize=100))
 
     def overall(self, unix_time: int = None) -> list:
         if unix_time is None:
