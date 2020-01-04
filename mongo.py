@@ -4,16 +4,17 @@ from typing import Dict, List, Union
 import pytz
 from pymongo import MongoClient, UpdateOne
 from bson import CodecOptions
-
+from retrying import retry
 
 class EmercitMongo:
     _timezone = pytz.timezone('Etc/GMT-3')
     _codec_options = CodecOptions(tz_aware=True, tzinfo=_timezone)
 
-    def __init__(self, host: str = 'localhost', port: int = 27017, dbname: str = 'emercit'):
+    def __init__(self, host: str = '192.168.5.203', port: int = 27017, dbname: str = 'emercit'):
         mgo = MongoClient(host=host, port=port)
         self._db = mgo[dbname]
 
+    @retry
     def save_features(self, features: list):
         features_col = self._db['features']
         for feature in features:
@@ -21,6 +22,7 @@ class EmercitMongo:
             feature_update = {'$set': feature}
             features_col.update_one(feature_filter, feature_update, upsert=True)
 
+    @retry
     def save_measurements(self, station_id: int, mode: str, measurements: Dict[str, Dict[datetime, Union[None, int, float, str]]]):
         mes_updates = {}
         for mes_type, mes_ts in measurements.items():
@@ -48,6 +50,7 @@ class EmercitMongo:
         measurements_col = self._db['measurements'].with_options(codec_options=self._codec_options)
         measurements_col.bulk_write(bulk_updates, ordered=False)
 
+    @retry
     def get_measurements(self, station_id: int, mode: str,
                          period_from: Union[datetime, date],
                          period_to: [datetime, date],
