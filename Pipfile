@@ -12,6 +12,7 @@ pytz = "*"
 pymongo = "*"
 tqdm = "*"
 retrying = "*"
+pandas = "*"
 
 [requires]
 python_version = "*"
