@@ -1,10 +1,12 @@
 from datetime import datetime, date
+from pprint import pprint
 from typing import Dict, List, Union
 
 import pytz
 from pymongo import MongoClient, UpdateOne
 from bson import CodecOptions
 from retrying import retry
+
 
 class EmercitMongo:
     _timezone = pytz.timezone('Etc/GMT-3')
@@ -71,6 +73,26 @@ class EmercitMongo:
                 '$gte': period_from,
                 '$lt': period_to
             }
-        }, sort=[('time', 1)])
+        }, {'_id': 0, 'mode': 0}, sort=[('time', 1)])
         for mes in mes_cur:
             yield mes
+
+    @retry
+    def get_features(self, data_type: str = "river_level"):
+        features_col = self._db['features'].with_options(codec_options=self._codec_options)
+        ftr_cur = features_col.find({
+            f'properties.data.{data_type}': {'$ne': None},
+        }, sort=[("properties.name", 1)], no_cursor_timeout=True)
+        for ftr in ftr_cur:
+            yield ftr
+
+    @retry
+    def get_station(self, station_id: int):
+        stations_col = self._db["stations"]
+        station = stations_col.find_one({"id": station_id})
+        return station
+
+
+if __name__ == '__main__':
+    em = EmercitMongo()
+    pprint(list(em.get_features()))
