@@ -50,7 +50,7 @@ class EmercitProvider:
                 interval_end = to_date
             intervals.append((interval_start, interval_end))
 
-        with concurrent.futures.ThreadPoolExecutor() as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=40) as executor:
             interval_measurements = {executor.submit(self.get_measurements, start, end, exists_modes): (start, end)
                                      for start, end in intervals}
             with tqdm(total=len(interval_measurements)) as pbar:
