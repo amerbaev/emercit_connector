@@ -1,10 +1,10 @@
 from datetime import datetime, date
 from pprint import pprint
-from typing import Dict, List, Union
+from typing import Dict, Union
 
 import pytz
-from pymongo import MongoClient, UpdateOne
 from bson import CodecOptions
+from pymongo import MongoClient, UpdateOne
 from retrying import retry
 
 
@@ -25,7 +25,8 @@ class EmercitMongo:
             features_col.update_one(feature_filter, feature_update, upsert=True)
 
     @retry
-    def save_measurements(self, station_id: int, mode: str, measurements: Dict[str, Dict[datetime, Union[None, int, float, str]]]):
+    def save_measurements(self, station_id: int, mode: str,
+                          measurements: Dict[str, Dict[datetime, Union[None, int, float, str]]]):
         mes_updates = {}
         for mes_type, mes_ts in measurements.items():
             for mes_time, mes_val in mes_ts.items():

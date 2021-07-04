@@ -2,8 +2,8 @@ from datetime import datetime
 
 import pandas as pd
 
-from mongo import EmercitMongo
 from mappings import map_kwargs
+from mongo import EmercitMongo
 
 
 def export_csv(from_date: datetime, to_date: datetime, data_type: str = "river_level"):
@@ -40,6 +40,7 @@ def export_csv(from_date: datetime, to_date: datetime, data_type: str = "river_l
             index=False,
             date_format="%d.%m.%Y %H:%M:%S",
         )
+
 
 if __name__ == '__main__':
     export_csv(from_date=datetime(year=2014, month=3, day=26), to_date=datetime.today(), data_type="river_level")

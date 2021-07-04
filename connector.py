@@ -1,10 +1,10 @@
+import datetime
 import logging
 import time
-import datetime
 from typing import Union
 
-import requests
 import pytz
+import requests
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 
@@ -53,7 +53,11 @@ class EmercitConnector:
 
         today_date = datetime.date.today()
         if date_to is None:
-            date_to = today_date if date_from is None else datetime.datetime.strptime(date_from, '%Y-%m-%d').date() if isinstance(date_from, str) else date_from
+            date_to = today_date \
+                if date_from is None \
+                else datetime.datetime.strptime(date_from, '%Y-%m-%d').date() \
+                if isinstance(date_from, str) \
+                else date_from
         if date_from is None:
             date_from = today_date if today_date <= date_to else date_to
 

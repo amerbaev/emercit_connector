@@ -1,13 +1,13 @@
-import logging
 import concurrent.futures
+import logging
 from datetime import date, timedelta
 from typing import List, Tuple, Dict, Any
 
-from connector import EmercitConnector
-from mongo import EmercitMongo
-from mappings import map_kwargs
-
 from tqdm import tqdm
+
+from connector import EmercitConnector
+from mappings import map_kwargs
+from mongo import EmercitMongo
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
