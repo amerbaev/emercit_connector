@@ -39,7 +39,7 @@ def export_csv(from_date: datetime, to_date: datetime, data_type: str = "river_l
             decimal=",",
             float_format="%.3f",
             index=False,
-            date_format="%d.%m.%Y %H:%M",
+            date_format="%d.%m.%Y %H:%M:%S",
         )
     # full_df = pd.concat([full_df, station_df], ignore_index=True)
 
