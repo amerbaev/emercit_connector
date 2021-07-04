@@ -9,7 +9,6 @@ from mappings import map_kwargs
 def export_csv(from_date: datetime, to_date: datetime, data_type: str = "river_level"):
     em = EmercitMongo(host='192.168.5.203')
 
-    full_df = pd.DataFrame()
     for feature in em.get_features(data_type=data_type):
         ftr_id = feature.get("properties", {}).get("id", None)
         ftr_name = feature.get("properties", {}).get("name", None)
@@ -41,8 +40,6 @@ def export_csv(from_date: datetime, to_date: datetime, data_type: str = "river_l
             index=False,
             date_format="%d.%m.%Y %H:%M:%S",
         )
-    # full_df = pd.concat([full_df, station_df], ignore_index=True)
-
 
 if __name__ == '__main__':
     export_csv(from_date=datetime(year=2014, month=3, day=26), to_date=datetime.today(), data_type="river_level")
