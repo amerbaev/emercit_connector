@@ -27,9 +27,13 @@ def export_csv(from_date: datetime, to_date: datetime, data_type: str = "river_l
         station_df = pd.DataFrame(measurements)
         station_df['name'] = ftr_name
         station_df.drop(columns=["station_id"], inplace=True)
-        station_df.rename(columns={"time": "datetime", "d": "distance", "z": "zero"}, inplace=True)
-        # station_df.rename(columns={"time": "datetime"}, inplace=True)
-        station_df = station_df[["name", "datetime", "bs", "distance", "zero"]]
+        if data_type == "river_level":
+            station_df.rename(columns={"d": "distance", "z": "zero"}, inplace=True)
+            # station_df.rename(columns={"time": "datetime"}, inplace=True)
+            station_df = station_df[["name", "datetime", "bs", "distance", "zero"]]
+        else:
+            station_df.rename(columns={"time": "datetime"}, inplace=True)
+            station_df = station_df[["name", "datetime", data_type]]
         station_df["datetime"] = station_df["datetime"].dt.tz_localize(None)
         print(station_df)
         station_df.to_csv(
@@ -43,4 +47,4 @@ def export_csv(from_date: datetime, to_date: datetime, data_type: str = "river_l
 
 
 if __name__ == '__main__':
-    export_csv(from_date=datetime(year=2014, month=3, day=26), to_date=datetime.today(), data_type="river_level")
+    export_csv(from_date=datetime(year=2017, month=11, day=18), to_date=datetime.today(), data_type="discharge")
