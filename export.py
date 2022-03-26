@@ -1,3 +1,4 @@
+import os.path
 from datetime import datetime
 
 import pandas as pd
@@ -13,6 +14,10 @@ def export_csv(from_date: datetime, to_date: datetime, data_type: str = "river_l
         ftr_id = feature.get("properties", {}).get("id", None)
         ftr_name = feature.get("properties", {}).get("name", None)
         print(ftr_name)
+        csv_file_path = f"F:/export/{ftr_name}-{from_date.date()}-{to_date.date()}-{data_type}.csv"
+        if os.path.exists(csv_file_path):
+            print("File already exists")
+            continue
         if not ftr_id or not ftr_name:
             print("Can't get feature id or name", feature)
             continue
@@ -23,6 +28,7 @@ def export_csv(from_date: datetime, to_date: datetime, data_type: str = "river_l
             **map_kwargs(data_type)
         ))
         if not measurements:
+            print("No measurements found")
             continue
         station_df = pd.DataFrame(measurements)
         station_df['name'] = ftr_name
@@ -36,7 +42,7 @@ def export_csv(from_date: datetime, to_date: datetime, data_type: str = "river_l
         station_df["datetime"] = station_df["datetime"].dt.tz_localize(None)
         print(station_df)
         station_df.to_csv(
-            f"export/{ftr_name}-{from_date.date()}-{to_date.date()}-{data_type}.csv",
+            csv_file_path,
             sep=";",
             decimal=",",
             float_format="%.3f",
@@ -46,4 +52,4 @@ def export_csv(from_date: datetime, to_date: datetime, data_type: str = "river_l
 
 
 if __name__ == '__main__':
-    export_csv(from_date=datetime(year=2017, month=11, day=18), to_date=datetime.today(), data_type="discharge")
+    export_csv(from_date=datetime(year=2014, month=4, day=1), to_date=datetime(year=2021, month=3, day=26), data_type="river_level")
